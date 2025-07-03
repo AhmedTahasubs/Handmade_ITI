@@ -36,8 +36,8 @@ namespace HandmadeITI.Core.Models
 
         [Required]
         public UserRole Role { get; set; }
-        [ForeignKey("Cart")]
-        public int? CartId { get; set; }
+       
+       
         public Cart? Cart { get; set; }
         public List<Review> Reviews { get; set; } = new();
         public List<Order> Orders { get; set; } = new();
