@@ -22,7 +22,7 @@ namespace HandmadeITI.Core.Models
 
         public bool IsApproved { get; set; }
 
-        public List<string> ImageUrls { get; set; } = new();
+        public string? ImageUrl { get; set; } 
 
         [Required]
         public DateTime CreatedAt { get; set; }
