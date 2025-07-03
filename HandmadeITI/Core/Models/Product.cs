@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HandmadeITI.Core.Models
@@ -28,9 +29,11 @@ namespace HandmadeITI.Core.Models
         public DateTime CreatedAt { get; set; }
         [ForeignKey("Seller")]
         public int SellerId { get; set; }
+        [ValidateNever]
         public User Seller { get; set; }
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
+        [ValidateNever]
         public Category Category { get; set; }
 
         public List<Review> Reviews { get; set; } = new();
