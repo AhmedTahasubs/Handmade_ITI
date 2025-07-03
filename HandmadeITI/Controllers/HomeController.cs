@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using HandmadeITI.Models;
+using HandmadeITI.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HandmadeITI.Controllers

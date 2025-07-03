@@ -1,4 +1,4 @@
-namespace HandmadeITI.Models
+namespace HandmadeITI.Core.Models
 {
     public class ErrorViewModel
     {
