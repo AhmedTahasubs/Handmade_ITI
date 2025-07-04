@@ -9,10 +9,10 @@ namespace HandmadeITI.Core.Models
         public int ReviewId { get; set; }
         [ForeignKey("Product")]
         public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public Product? Product { get; set; }
         [ForeignKey("User")]
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [Required, Range(1, 5)]
         public int Rating { get; set; }

@@ -11,11 +11,11 @@ namespace HandmadeITI.Core.Models
         [ForeignKey("Order")]
         public int OrderId { get; set; }
         [ValidateNever]
-        public Order Order { get; set; }
+        public Order? Order { get; set; }
         [ForeignKey("Product")]
         public int ProductId { get; set; }
         [ValidateNever]
-        public Product Product { get; set; }
+        public Product? Product { get; set; }
 
         [Required, Range(1, int.MaxValue)]
         public int Quantity { get; set; }

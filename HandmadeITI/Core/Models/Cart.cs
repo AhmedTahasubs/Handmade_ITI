@@ -10,7 +10,7 @@ namespace HandmadeITI.Core.Models
 
        
         public int UserId { get; set; }
-        public User User { get; set; }
+        public User? User { get; set; }
 
         public List<CartItem> CartItems { get; set; } = new();
         public decimal TotalPrice { get; set; }
