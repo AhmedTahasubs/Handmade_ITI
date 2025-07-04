@@ -33,11 +33,6 @@ namespace HandmadeITI.Core.Models
         public string confirmPassword { get; set; } // For confirmation only, not stored    
 
         public bool IsBlackListed { get; set; }
-
-        [Required]
-        public UserRole Role { get; set; }
-       
-       
         public Cart? Cart { get; set; }
         public List<Review> Reviews { get; set; } = new();
         public List<Order> Orders { get; set; } = new();

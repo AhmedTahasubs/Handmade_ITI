@@ -16,7 +16,7 @@ namespace HandmadeITI.Core.Models
         public int UserId { get; set; }
         [ValidateNever]
 
-        public User User { get; set; }
+        public User? User { get; set; }
 
         [Required, MaxLength(250)]
         public string ShippingAddress { get; set; }

@@ -30,11 +30,11 @@ namespace HandmadeITI.Core.Models
         [ForeignKey("Seller")]
         public int SellerId { get; set; }
         [ValidateNever]
-        public User Seller { get; set; }
+        public User? Seller { get; set; }
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
         [ValidateNever]
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
 
         public List<Review> Reviews { get; set; } = new();
     }
