@@ -1,4 +1,6 @@
+using HandmadeITI.Core.Models;
 using HandmadeITI.Data;
+using HandmadeITI.Respo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +22,7 @@ namespace HandmadeITI
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddTransient<Irepo<Product>, ProductRepo>(); //hammad
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
