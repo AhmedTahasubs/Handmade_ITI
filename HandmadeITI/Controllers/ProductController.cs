@@ -60,7 +60,7 @@ namespace HandmadeITI.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,Title,Price,Description,Quantity,IsApproved,CreatedAt,SellerId,CategoryId")] Product product, IFormFile imageFile)
+        public async Task<IActionResult> Create([Bind("ProductId,Title,Price,Description,Quantity,IsApproved,CreatedAt,SellerId,CategoryId")] Product product, IFormFile? imageFile)
         {
             // تحقق يدوي من الصورة
             if (imageFile == null || imageFile.Length == 0)
@@ -70,6 +70,9 @@ namespace HandmadeITI.Controllers
                 ViewData["SellerId"] = new SelectList(_context.Set<User>(), "UserId", "Email", product.SellerId);
                 return View(product);
             }
+            //ViewBag.Errors = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => $"Field: {kv.Key} - Error: {e.ErrorMessage}")).ToList();
+
+
 
             if (ModelState.IsValid)
             {
