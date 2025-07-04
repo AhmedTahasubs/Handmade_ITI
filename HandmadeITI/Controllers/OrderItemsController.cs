@@ -7,23 +7,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HandmadeITI.Core.Models;
 using HandmadeITI.Data;
+using HandmadeITI.Repos;
 
 namespace HandmadeITI.Controllers
 {
     public class OrderItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly OrderItemRepo _repo;
 
-        public OrderItemsController(ApplicationDbContext context)
+        public OrderItemsController(ApplicationDbContext context, OrderItemRepo repo)
         {
             _context = context;
+            _repo = repo;
         }
 
         // GET: OrderItems
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.OrderItem.Include(o => o.Order).Include(o => o.Product);
-            return View(await applicationDbContext.ToListAsync());
+            return View(await _repo.GetAll());
         }
 
         // GET: OrderItems/Details/5
@@ -34,10 +36,7 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var orderItem = await _context.OrderItem
-                .Include(o => o.Order)
-                .Include(o => o.Product)
-                .FirstOrDefaultAsync(m => m.OrderItemId == id);
+            var orderItem = await _repo.GetById(id);
             if (orderItem == null)
             {
                 return NotFound();
@@ -63,8 +62,8 @@ namespace HandmadeITI.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(orderItem);
-                await _context.SaveChangesAsync();
+                _repo.Add(orderItem);
+                await _repo.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["OrderId"] = new SelectList(_context.Order, "OrderId", "PaymentMethod", orderItem.OrderId);
@@ -80,7 +79,7 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var orderItem = await _context.OrderItem.FindAsync(id);
+            var orderItem = await _repo.GetById(id);
             if (orderItem == null)
             {
                 return NotFound();
@@ -106,8 +105,8 @@ namespace HandmadeITI.Controllers
             {
                 try
                 {
-                    _context.Update(orderItem);
-                    await _context.SaveChangesAsync();
+                    _repo.Update(orderItem);
+                    await _repo.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -135,10 +134,7 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var orderItem = await _context.OrderItem
-                .Include(o => o.Order)
-                .Include(o => o.Product)
-                .FirstOrDefaultAsync(m => m.OrderItemId == id);
+            var orderItem =_repo.GetById(id);
             if (orderItem == null)
             {
                 return NotFound();
@@ -152,13 +148,9 @@ namespace HandmadeITI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var orderItem = await _context.OrderItem.FindAsync(id);
-            if (orderItem != null)
-            {
-                _context.OrderItem.Remove(orderItem);
-            }
+            _repo.Delete(id);
 
-            await _context.SaveChangesAsync();
+            await _repo.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
