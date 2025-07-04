@@ -7,36 +7,36 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HandmadeITI.Core.Models;
 using HandmadeITI.Data;
+using HandmadeITI.Repos;
 
 namespace HandmadeITI.Controllers
 {
     public class OrdersController : Controller
     {
+        private readonly IOrdersRepo ordersRepo;
         private readonly ApplicationDbContext _context;
 
-        public OrdersController(ApplicationDbContext context)
+        public OrdersController(IOrdersRepo _ordersRepo, ApplicationDbContext context)
         {
+            ordersRepo = _ordersRepo;
             _context = context;
         }
 
         // GET: Orders
-        public async Task<IActionResult> Index()
+        public  IActionResult Index()
         {
-            var applicationDbContext = _context.Order.Include(o => o.User);
-            return View(await applicationDbContext.ToListAsync());
+            return View(ordersRepo.GetAllOrders());
         }
 
         // GET: Orders/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var order = await _context.Order
-                .Include(o => o.User)
-                .FirstOrDefaultAsync(m => m.OrderId == id);
+            var order = ordersRepo.GetOrder(id.Value);
             if (order == null)
             {
                 return NotFound();
@@ -48,7 +48,7 @@ namespace HandmadeITI.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email");
+            ViewBag.UserId = new SelectList(_context.Set<User>(), "UserId", "Email");
             return View();
         }
 
@@ -59,13 +59,14 @@ namespace HandmadeITI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("OrderId,CreatedAt,UserId,ShippingAddress,OrderStatus,PaymentStatus,TotalPrice,PaymentMethod")] Order order)
         {
+            ViewBag.Errors = ModelState.SelectMany(kv => kv.Value.Errors.Select(e => $"Field: {kv.Key} - Error: {e.ErrorMessage}")).ToList();
             if (ModelState.IsValid)
             {
-                _context.Add(order);
-                await _context.SaveChangesAsync();
+                ordersRepo.AddOrder(order);
+                ordersRepo.Save();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", order.UserId);
+            ViewBag.UserId = new SelectList(_context.Set<User>(), "UserId", "Email", order.UserId);
             return View(order);
         }
 
@@ -77,12 +78,12 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var order = await _context.Order.FindAsync(id);
+            var order = ordersRepo.GetOrder(id.Value);
             if (order == null)
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", order.UserId);
+            ViewBag.UserId = new SelectList(_context.Set<User>(), "UserId", "Email");
             return View(order);
         }
 
@@ -102,12 +103,12 @@ namespace HandmadeITI.Controllers
             {
                 try
                 {
-                    _context.Update(order);
-                    await _context.SaveChangesAsync();
+                   ordersRepo.UpdateOrder(order);
+                    ordersRepo.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrderExists(order.OrderId))
+                    if (!ordersRepo.OrderExists(order.OrderId))
                     {
                         return NotFound();
                     }
@@ -118,7 +119,7 @@ namespace HandmadeITI.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", order.UserId);
+            ViewBag.UserId = new SelectList(_context.Set<User>(), "UserId", "Email");
             return View(order);
         }
 
@@ -130,9 +131,7 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var order = await _context.Order
-                .Include(o => o.User)
-                .FirstOrDefaultAsync(m => m.OrderId == id);
+            var order = ordersRepo.GetOrder(id.Value);
             if (order == null)
             {
                 return NotFound();
@@ -146,19 +145,11 @@ namespace HandmadeITI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var order = await _context.Order.FindAsync(id);
-            if (order != null)
-            {
-                _context.Order.Remove(order);
-            }
-
-            await _context.SaveChangesAsync();
+            ordersRepo.DeleteOrder(id);
+            ordersRepo.Save();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool OrderExists(int id)
-        {
-            return _context.Order.Any(e => e.OrderId == id);
-        }
+        
     }
 }
