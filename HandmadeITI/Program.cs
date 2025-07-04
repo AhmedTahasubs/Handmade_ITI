@@ -28,6 +28,8 @@ namespace HandmadeITI
             builder.Services.AddTransient<Irepo<Product>, ProductRepo>(); //hammad
             builder.Services.AddScoped<Irepo<Cart>, CartsRepo>();
             builder.Services.AddScoped<Irepo<CartItem>, CartItemsRepo>();
+            builder.Services.AddScoped<Irepo<Category>, CategoriesRepo>();//taha
+            builder.Services.AddScoped<Irepo<Review>, ReviewsRepo>();//taha
 
             var app = builder.Build();
 

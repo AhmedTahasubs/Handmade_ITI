@@ -2,28 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HandmadeITI.Core.Models;
+using HandmadeITI.Data;
+using HandmadeITI.Respo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HandmadeITI.Core.Models;
-using HandmadeITI.Data;
 
 namespace HandmadeITI.Controllers
 {
     public class ReviewsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly Irepo<Review> _reviewRepo;
 
-        public ReviewsController(ApplicationDbContext context)
+
+        public ReviewsController(ApplicationDbContext context, Irepo<Review> reviewRepo)
         {
             _context = context;
+            _reviewRepo = reviewRepo;
         }
 
         // GET: Reviews
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Review.Include(r => r.Product).Include(r => r.User);
-            return View(await applicationDbContext.ToListAsync());
+            var reviews = await _reviewRepo.GetAll();
+            return View(reviews);
         }
 
         // GET: Reviews/Details/5
@@ -33,11 +37,7 @@ namespace HandmadeITI.Controllers
             {
                 return NotFound();
             }
-
-            var review = await _context.Review
-                .Include(r => r.Product)
-                .Include(r => r.User)
-                .FirstOrDefaultAsync(m => m.ReviewId == id);
+            var review = await _reviewRepo.GetById(id);
             if (review == null)
             {
                 return NotFound();
@@ -63,9 +63,8 @@ namespace HandmadeITI.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(review);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                await _reviewRepo.Add(review);
+                await _reviewRepo.SaveChanges();
             }
             ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "Title", review.ProductId);
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", review.UserId);
@@ -79,8 +78,7 @@ namespace HandmadeITI.Controllers
             {
                 return NotFound();
             }
-
-            var review = await _context.Review.FindAsync(id);
+            var review = await _reviewRepo.GetById(id);
             if (review == null)
             {
                 return NotFound();
@@ -106,8 +104,8 @@ namespace HandmadeITI.Controllers
             {
                 try
                 {
-                    _context.Update(review);
-                    await _context.SaveChangesAsync();
+                    await _reviewRepo.Update(review);
+                    await _reviewRepo.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -120,7 +118,7 @@ namespace HandmadeITI.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             ViewData["ProductId"] = new SelectList(_context.Product, "ProductId", "Title", review.ProductId);
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", review.UserId);
@@ -134,11 +132,7 @@ namespace HandmadeITI.Controllers
             {
                 return NotFound();
             }
-
-            var review = await _context.Review
-                .Include(r => r.Product)
-                .Include(r => r.User)
-                .FirstOrDefaultAsync(m => m.ReviewId == id);
+            var review = await _reviewRepo.GetById(id);
             if (review == null)
             {
                 return NotFound();
@@ -152,19 +146,33 @@ namespace HandmadeITI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var review = await _context.Review.FindAsync(id);
+            var review = await _reviewRepo.GetById(id);
             if (review != null)
             {
-                _context.Review.Remove(review);
+                await _reviewRepo.Delete(id);
+                await _reviewRepo.SaveChanges();
             }
-
-            await _context.SaveChangesAsync();
+            else
+            {
+                return NotFound();
+            }
             return RedirectToAction(nameof(Index));
         }
 
         private bool ReviewExists(int id)
         {
-            return _context.Review.Any(e => e.ReviewId == id);
+            try
+            {
+                return _reviewRepo.GetById(id) != null;
+            }
+            catch (KeyNotFoundException)
+            {
+                return false;
+            }
+            catch (ArgumentNullException)
+            {
+                return false;
+            }
         }
     }
 }
