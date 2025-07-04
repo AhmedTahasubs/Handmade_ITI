@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using HandmadeITI.Core.Const;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using HandmadeITI.Core.Const;
 
 namespace HandmadeITI.Core.Models
 {
@@ -13,6 +14,8 @@ namespace HandmadeITI.Core.Models
         public DateTime CreatedAt { get; set; }
         [ForeignKey("User")]
         public int UserId { get; set; }
+        [ValidateNever]
+
         public User User { get; set; }
 
         [Required, MaxLength(250)]

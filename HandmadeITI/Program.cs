@@ -1,5 +1,6 @@
 using HandmadeITI.Core.Models;
 using HandmadeITI.Data;
+using HandmadeITI.Repos;
 using HandmadeITI.Respo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,8 @@ namespace HandmadeITI
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.Services.AddScoped<IOrdersRepo, OrdersRepo>();
+            builder.Services.AddScoped<OrderItemRepo, OrderItemRepo>();
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddTransient<Irepo<Product>, ProductRepo>(); //hammad
