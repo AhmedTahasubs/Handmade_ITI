@@ -1,29 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HandmadeITI.Core.Models;
+using HandmadeITI.Data;
+using HandmadeITI.Respo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HandmadeITI.Core.Models;
-using HandmadeITI.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HandmadeITI.Controllers
 {
     public class CartItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly Irepo<CartItem> db;
 
-        public CartItemsController(ApplicationDbContext context)
+        public CartItemsController(ApplicationDbContext context, Irepo<CartItem> CartItemsRepo)
         {
             _context = context;
+            db = CartItemsRepo;
         }
 
         // GET: CartItems
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.CartItem.Include(c => c.Cart).Include(c => c.Product);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = await db.GetAll();
+            return View(applicationDbContext);
         }
 
         // GET: CartItems/Details/5
@@ -34,10 +37,7 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var cartItem = await _context.CartItem
-                .Include(c => c.Cart)
-                .Include(c => c.Product)
-                .FirstOrDefaultAsync(m => m.CartItemId == id);
+            var cartItem = await db.GetById(id);
             if (cartItem == null)
             {
                 return NotFound();
@@ -63,8 +63,8 @@ namespace HandmadeITI.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(cartItem);
-                await _context.SaveChangesAsync();
+                db.Add(cartItem);
+                await db.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CartId"] = new SelectList(_context.Cart, "CartId", "CartId", cartItem.CartId);
@@ -106,8 +106,8 @@ namespace HandmadeITI.Controllers
             {
                 try
                 {
-                    _context.Update(cartItem);
-                    await _context.SaveChangesAsync();
+                    db.Update(cartItem);
+                    await db.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -135,10 +135,7 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var cartItem = await _context.CartItem
-                .Include(c => c.Cart)
-                .Include(c => c.Product)
-                .FirstOrDefaultAsync(m => m.CartItemId == id);
+            var cartItem = await db.GetById(id);
             if (cartItem == null)
             {
                 return NotFound();
@@ -155,10 +152,10 @@ namespace HandmadeITI.Controllers
             var cartItem = await _context.CartItem.FindAsync(id);
             if (cartItem != null)
             {
-                _context.CartItem.Remove(cartItem);
+                db.Delete(id);
             }
 
-            await _context.SaveChangesAsync();
+            await db.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 
