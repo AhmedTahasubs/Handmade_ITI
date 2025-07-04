@@ -26,6 +26,9 @@ namespace HandmadeITI
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddTransient<Irepo<Product>, ProductRepo>(); //hammad
+            builder.Services.AddScoped<Irepo<Cart>, CartsRepo>();
+            builder.Services.AddScoped<Irepo<CartItem>, CartItemsRepo>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

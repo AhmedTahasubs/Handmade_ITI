@@ -1,29 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using HandmadeITI.Core.Models;
+using HandmadeITI.Data;
+using HandmadeITI.Respo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HandmadeITI.Core.Models;
-using HandmadeITI.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HandmadeITI.Controllers
 {
     public class CartsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly Irepo<Cart> db;
 
-        public CartsController(ApplicationDbContext context)
+        public CartsController(ApplicationDbContext context, Irepo<Cart> CartRepo)
         {
             _context = context;
+            db = CartRepo;
         }
 
         // GET: Carts
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Cart.Include(c => c.User);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = await db.GetAll();
+            return View( applicationDbContext);
         }
 
         // GET: Carts/Details/5
@@ -34,9 +37,7 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var cart = await _context.Cart
-                .Include(c => c.User)
-                .FirstOrDefaultAsync(m => m.CartId == id);
+            var cart = await db.GetById(id);
             if (cart == null)
             {
                 return NotFound();
@@ -61,8 +62,8 @@ namespace HandmadeITI.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(cart);
-                await _context.SaveChangesAsync();
+                db.Add(cart);
+                await db.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["UserId"] = new SelectList(_context.Set<User>(), "UserId", "Email", cart.UserId);
@@ -102,8 +103,8 @@ namespace HandmadeITI.Controllers
             {
                 try
                 {
-                    _context.Update(cart);
-                    await _context.SaveChangesAsync();
+                    db.Update(cart);
+                    await db.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -130,9 +131,7 @@ namespace HandmadeITI.Controllers
                 return NotFound();
             }
 
-            var cart = await _context.Cart
-                .Include(c => c.User)
-                .FirstOrDefaultAsync(m => m.CartId == id);
+            var cart = await db.GetById(id);
             if (cart == null)
             {
                 return NotFound();
@@ -146,10 +145,10 @@ namespace HandmadeITI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cart = await _context.Cart.FindAsync(id);
-            if (cart != null)
+            
+            if (id != null)
             {
-                _context.Cart.Remove(cart);
+                db.Delete(id);
             }
 
             await _context.SaveChangesAsync();
