@@ -2,27 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HandmadeITI.Core.Models;
+using HandmadeITI.Data;
+using HandmadeITI.Repos;
+using HandmadeITI.Respo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HandmadeITI.Core.Models;
-using HandmadeITI.Data;
 
 namespace HandmadeITI.Controllers
 {
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly Irepo<Category> _categoryRepo;
 
-        public CategoriesController(ApplicationDbContext context)
+        public CategoriesController(ApplicationDbContext context, Irepo<Category> categoryRepo)
         {
             _context = context;
+            _categoryRepo = categoryRepo;
         }
 
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Category.ToListAsync());
+            var categories = await _categoryRepo.GetAll();
+            return View(categories);
         }
 
         // GET: Categories/Details/5
@@ -32,9 +37,7 @@ namespace HandmadeITI.Controllers
             {
                 return NotFound();
             }
-
-            var category = await _context.Category
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            var category = await _categoryRepo.GetById(id);
             if (category == null)
             {
                 return NotFound();
@@ -58,9 +61,11 @@ namespace HandmadeITI.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // Set CreatedAt to current time
+                category.CreatedAt = DateTime.Now;
+                await _categoryRepo.Add(category);
+                await _categoryRepo.SaveChanges();
+                return RedirectToAction("Index");
             }
             return View(category);
         }
@@ -72,8 +77,7 @@ namespace HandmadeITI.Controllers
             {
                 return NotFound();
             }
-
-            var category = await _context.Category.FindAsync(id);
+            var category = await _categoryRepo.GetById(id);
             if (category == null)
             {
                 return NotFound();
@@ -97,8 +101,9 @@ namespace HandmadeITI.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    // Dont Update CreatedAt to current time Cause its Creation Time
+                    await _categoryRepo.Update(category);
+                    await _categoryRepo.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -111,7 +116,7 @@ namespace HandmadeITI.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
             return View(category);
         }
@@ -123,9 +128,7 @@ namespace HandmadeITI.Controllers
             {
                 return NotFound();
             }
-
-            var category = await _context.Category
-                .FirstOrDefaultAsync(m => m.CategoryId == id);
+            var category = await _categoryRepo.GetById(id);
             if (category == null)
             {
                 return NotFound();
@@ -139,19 +142,33 @@ namespace HandmadeITI.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Category.FindAsync(id);
+            var category = await _categoryRepo.GetById(id);
             if (category != null)
             {
-                _context.Category.Remove(category);
+                await _categoryRepo.Delete(id);
+                await _categoryRepo.SaveChanges();
             }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            else
+            {
+                return NotFound();
+            }
+            return RedirectToAction("Index");
         }
 
         private bool CategoryExists(int id)
         {
-            return _context.Category.Any(e => e.CategoryId == id);
+            try
+            {
+                return _categoryRepo.GetById(id) != null;
+            }
+            catch (KeyNotFoundException)
+            {
+                return false;
+            }
+            catch (ArgumentNullException)
+            {
+                return false;
+            }
         }
     }
 }

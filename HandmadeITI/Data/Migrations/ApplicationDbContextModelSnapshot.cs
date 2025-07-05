@@ -132,7 +132,7 @@ namespace HandmadeITI.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Cart");
+                    b.ToTable("Cart", (string)null);
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.CartItem", b =>
@@ -161,7 +161,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItem");
+                    b.ToTable("CartItem", (string)null);
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.Category", b =>
@@ -182,7 +182,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Category");
+                    b.ToTable("Category", (string)null);
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.Order", b =>
@@ -221,7 +221,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Order", (string)null);
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.OrderItem", b =>
@@ -250,7 +250,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItem");
+                    b.ToTable("OrderItem", (string)null);
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.Product", b =>
@@ -298,7 +298,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Product");
+                    b.ToTable("Product", (string)null);
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.Review", b =>
@@ -329,7 +329,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Review");
+                    b.ToTable("Review", (string)null);
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.User", b =>
@@ -375,7 +375,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
