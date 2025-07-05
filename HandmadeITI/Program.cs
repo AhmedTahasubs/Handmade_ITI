@@ -19,7 +19,7 @@ namespace HandmadeITI
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddScoped<IOrdersRepo, OrdersRepo>();
             builder.Services.AddScoped<OrderItemRepo, OrderItemRepo>();
@@ -44,6 +44,7 @@ namespace HandmadeITI
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
