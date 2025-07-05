@@ -4,6 +4,7 @@ using HandmadeITI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HandmadeITI.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250705180151_ExtendUsersTable")]
+    partial class ExtendUsersTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,9 +37,6 @@ namespace HandmadeITI.Data.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedById")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
@@ -54,9 +54,6 @@ namespace HandmadeITI.Data.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
-
-                    b.Property<string>("LastUpdatedByid")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LastUpdatedOn")
                         .HasColumnType("datetime2");
@@ -132,7 +129,7 @@ namespace HandmadeITI.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Cart", (string)null);
+                    b.ToTable("Cart");
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.CartItem", b =>
@@ -161,7 +158,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItem", (string)null);
+                    b.ToTable("CartItem");
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.Category", b =>
@@ -182,7 +179,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Category", (string)null);
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.Order", b =>
@@ -221,7 +218,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Order", (string)null);
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.OrderItem", b =>
@@ -250,7 +247,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItem", (string)null);
+                    b.ToTable("OrderItem");
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.Product", b =>
@@ -298,7 +295,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Product", (string)null);
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.Review", b =>
@@ -329,7 +326,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Review", (string)null);
+                    b.ToTable("Review");
                 });
 
             modelBuilder.Entity("HandmadeITI.Core.Models.User", b =>
@@ -375,7 +372,7 @@ namespace HandmadeITI.Data.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
