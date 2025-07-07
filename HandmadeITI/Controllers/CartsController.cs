@@ -148,7 +148,7 @@ namespace HandmadeITI.Controllers
             
             if (id != null)
             {
-                db.Delete(id);
+                await db.Delete(id);
             }
 
             await _context.SaveChangesAsync();
