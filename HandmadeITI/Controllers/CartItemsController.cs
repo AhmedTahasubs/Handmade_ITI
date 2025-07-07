@@ -152,7 +152,7 @@ namespace HandmadeITI.Controllers
             var cartItem = await _context.CartItem.FindAsync(id);
             if (cartItem != null)
             {
-                db.Delete(id);
+                await db.Delete(id);
             }
 
             await db.SaveChanges();
