@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿@* <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,7 +6,6 @@
     <title>@ViewData["Title"] - HandmadeITI</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    @* <link href="~/css/output.css" rel="stylesheet" /> *@
     <link rel="stylesheet" href="~/HandmadeITI.styles.css" asp-append-version="true" />
 </head>
 <body>
@@ -48,6 +47,287 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html> *@
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HandmadeITI Admin</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link href="~/lib/fontawesome-iconpicker/css/fontawesome-iconpicker.css" rel="stylesheet" />
+	<link href="~/lib/fontawesome-iconpicker/css/fontawesome-iconpicker.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/HandmadeITI.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 60px;
+        }
+
+        body {
+            font-size: 0.875rem;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+            .sidebar.collapsed {
+                width: var(--sidebar-collapsed-width);
+            }
+
+        .sidebar-brand {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .sidebar.collapsed .sidebar-brand span,
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+            .nav-link.active,
+            .nav-link:hover {
+                color: white;
+                background-color: rgba(255,255,255,0.15);
+            }
+
+            .nav-link i {
+                margin-right: 0.75rem;
+            }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem 0.5rem;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .top-navbar {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .content-wrapper {
+            padding: 1.5rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .notification-badge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            background: #dc3545;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        @@media (max-width: 768px) {
+        .sidebar{
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        .main-content,
+        .sidebar.collapsed + .main-content {
+            margin-left: 0;
+        }
+
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        .mobile-overlay.show {
+            display: block;
+        }
+        }
+
+        .breadcrumb {
+            background: none;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <a class="sidebar-brand" asp-controller="Admin" asp-action="Index">
+            <i class="bi bi-gear-fill"></i><span> HandmadeITI Admin</span>
+        </a>
+        <ul class="nav flex-column sidebar-nav">
+            <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="Dashboard"><i class="bi bi-speedometer2"></i><span> Dashboard</span></a></li>
+            <li class="nav-item"><a class="nav-link" asp-controller="Categories" asp-action="Index"><i class="bi bi-grid-3x3-gap"></i><span> Categories</span></a></li>
+            <li class="nav-item"><a class="nav-link" asp-controller="Products" asp-action="Index"><i class="bi bi-box-seam"></i><span> Products</span></a></li>
+            <li class="nav-item"><a class="nav-link" asp-controller="Orders" asp-action="Index"><i class="bi bi-cart-check"></i><span> Orders</span></a></li>
+            <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index"><i class="bi bi-people"></i><span> Users</span></a></li>
+            <li class="nav-item"><a class="nav-link" asp-controller="Reports" asp-action="Index"><i class="bi bi-graph-up"></i><span> Reports</span></a></li>
+            <li class="nav-item"><a class="nav-link" asp-controller="Settings" asp-action="Index"><i class="bi bi-gear"></i><span> Settings</span></a></li>
+            <li class="nav-item mt-auto"><a class="nav-link" asp-controller="Home" asp-action="Index"><i class="bi bi-house"></i><span> Back to Site</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <i class="fade fa-facebook"></i>
+    <div class="main-content">
+        <nav class="top-navbar d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <button class="sidebar-toggle d-md-none" id="sidebarToggle"><i class="bi bi-list"></i></button>
+                <button class="sidebar-toggle d-none d-md-block btn btn-warning fs-3 text-white" id="sidebarCollapseToggle"><i class="bi bi-list"></i></button>
+                <nav aria-label="breadcrumb" class="ms-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="/">Admin</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-3">
+                    <button class="btn btn-link text-dark notification-badge" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell fs-5"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><a class="dropdown-item" href="#">New order received</a></li>
+                        <li><a class="dropdown-item" href="#">Stock is low</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center" href="#">View all</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown user-dropdown">
+                    <button class="btn btn-link text-dark d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                        <div class="user-avatar">A</div>
+                        <span class="d-none d-sm-inline">Admin</span>
+                        <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i>Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="content-wrapper">
+            <main role="main">@RenderBody()</main>
+        </div>
+    </div>
+	<script src="~/lib/fontawesome-iconpicker/js/fontawesome-iconpicker.js"></script>
+	<script src="~/lib/fontawesome-iconpicker/js/fontawesome-iconpicker.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(function () {
+            $('#sidebarToggle').click(function () {
+                $('#sidebar').toggleClass('show');
+                $('#mobileOverlay').toggleClass('show');
+            });
+
+            $('#sidebarCollapseToggle').click(function () {
+                $('#sidebar').toggleClass('collapsed');
+                $('.main-content').toggleClass('collapsed');
+            });
+
+            $('#mobileOverlay').click(function () {
+                $('#sidebar').removeClass('show');
+                $(this).removeClass('show');
+            });
+
+            var currentPath = window.location.pathname.toLowerCase();
+            $('.sidebar-nav .nav-link').each(function () {
+                var href = $(this).attr('href')?.toLowerCase();
+                if (href && currentPath.startsWith(href) && href !== "/") {
+                    $('.sidebar-nav .nav-link').removeClass('active');
+                    $(this).addClass('active');
+                }
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
